@@ -630,56 +630,103 @@ h1, h2, h3 {
    ========================================================= */
 @media (max-width: 880px) {
   .app-shell { grid-template-columns: 1fr; }
+
+  /* Sidebar collapses into a slim top bar: just the logo + the
+     notification/logout icons. The nav links move out of here and
+     become a fixed bottom tab bar instead (see below) — that's the
+     familiar mobile-app pattern and avoids any cramped/overflowing
+     row of buttons. */
   .sidebar {
-    position: sticky; top: 0; z-index: 10;
-    flex-direction: row; align-items: center;
-    padding: 12px 16px; gap: 14px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    position: sticky; top: 0; z-index: 20;
+    flex-direction: row; align-items: center; justify-content: space-between;
+    padding: 12px 16px; gap: 10px;
   }
-  /* Previously these flex children shrank to fit the row instead of
-     scrolling, which clipped nav labels like "งานทั้งหมด". Lock their
-     size so the row scrolls horizontally instead. */
-  .sidebar > * { flex-shrink: 0; }
-  .brand img { width: 130px; height: auto; }
+  .brand img { width: 116px; height: auto; }
   .sidebar-footer {
     margin-top: 0;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
   }
-  .user-email { display: none; } /* no room on the mobile bar; still visible on desktop */
-  .ghost-btn { width: auto; white-space: nowrap; padding: 9px 12px; font-size: 12.5px; }
-  .nav { flex-direction: row; gap: 4px; }
-  .nav-item { white-space: nowrap; padding: 9px 12px; font-size: 14px; }
-  .main { padding: 20px 16px 60px; }
-  .stat-row { grid-template-columns: repeat(2, 1fr); }
+  .user-email { display: none; } /* no room up here; still visible on desktop */
+  .ghost-btn { width: auto; white-space: nowrap; padding: 8px 10px; font-size: 11.5px; }
+
+  /* Bottom tab bar: fixed, frosted, active tab gets a pill behind its icon */
+  .nav {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    flex-direction: row; justify-content: space-around;
+    gap: 2px;
+    background: rgba(250, 246, 238, 0.94);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(124, 62, 32, 0.12);
+    padding: 8px 6px calc(8px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -8px 22px rgba(62, 46, 35, 0.10);
+  }
+  .nav-item {
+    flex: 1;
+    flex-direction: column;
+    gap: 3px;
+    padding: 4px 2px 6px;
+    font-size: 10.5px;
+    border-radius: var(--radius-s);
+    text-align: center;
+  }
+  .nav-item:hover { transform: none; background: transparent; }
+  .nav-item .nav-icon {
+    font-size: 16px;
+    width: 32px; height: 32px;
+    margin: 0 auto;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .nav-item.is-active {
+    background: transparent;
+    color: var(--clay-dark);
+    box-shadow: none;
+  }
+  .nav-item.is-active .nav-icon {
+    background: var(--clay);
+    color: var(--cream);
+  }
+
+  .main { padding: 20px 16px calc(88px + env(safe-area-inset-bottom, 0px)); }
+  .stat-row { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .topbar { align-items: flex-start; }
 }
 
 @media (max-width: 560px) {
-  /* The old fix just set flex-wrap on the card, which crammed the
-     checkbox, title, subject chips, due date and edit/delete buttons
-     into overlapping lines. Use an explicit grid instead: checkbox +
-     info on row 1, due date on row 2, actions on row 3 — nothing can
-     overlap regardless of how much content is inside .assignment-info. */
+  /* Clean stacked card: checkbox + title/chips on top, a soft divider,
+     then the due date (left) and edit/delete actions (right) below.
+     Grid areas guarantee nothing can ever overlap, no matter how much
+     content is inside .assignment-info. */
   .assignment-card {
     display: grid;
-    grid-template-columns: 24px 1fr;
+    grid-template-columns: 26px 1fr auto;
     grid-template-areas:
-      "check info"
-      ".     due"
-      ".     actions";
-    row-gap: 8px;
-    column-gap: 12px;
-    align-items: start;
+      "check info   info"
+      ".     divider divider"
+      ".     due     actions";
+    row-gap: 10px;
+    column-gap: 10px;
+    align-items: center;
+    padding: 16px;
   }
-  .assignment-check { grid-area: check; }
+  .assignment-card::before {
+    content: "";
+    grid-area: divider;
+    border-top: 1px dashed rgba(62, 46, 35, 0.15);
+  }
+  .assignment-check { grid-area: check; align-self: start; margin-top: 2px; }
   .assignment-info { grid-area: info; min-width: 0; }
   .assignment-due {
     grid-area: due;
-    text-align: left;
-    min-width: 0;
+    display: flex; align-items: baseline; gap: 8px;
+    text-align: left; min-width: 0;
   }
-  .assignment-actions { grid-area: actions; }
+  .assignment-due .due-date { position: relative; padding-left: 12px; }
+  .assignment-due .due-date::before {
+    content: "•"; position: absolute; left: 0; opacity: 0.45;
+  }
+  .assignment-actions { grid-area: actions; align-self: center; }
 }
