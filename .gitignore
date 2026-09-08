@@ -1,0 +1,14 @@
+# dependencies
+node_modules/
+
+# secrets — ห้าม commit เด็ดขาด (มี service_role key และ Firebase private key)
+.env
+.env.local
+
+# logs
+npm-debug.log*
+*.log
+
+# OS / editor
+.DS_Store
+.vscode/
