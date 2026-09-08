@@ -633,16 +633,53 @@ h1, h2, h3 {
   .sidebar {
     position: sticky; top: 0; z-index: 10;
     flex-direction: row; align-items: center;
-    padding: 14px 16px; gap: 16px;
+    padding: 12px 16px; gap: 14px;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
-  .sidebar-footer { margin-top: 0; }
-  .nav { flex-direction: row; }
+  /* Previously these flex children shrank to fit the row instead of
+     scrolling, which clipped nav labels like "งานทั้งหมด". Lock their
+     size so the row scrolls horizontally instead. */
+  .sidebar > * { flex-shrink: 0; }
+  .brand img { width: 130px; height: auto; }
+  .sidebar-footer {
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .user-email { display: none; } /* no room on the mobile bar; still visible on desktop */
+  .ghost-btn { width: auto; white-space: nowrap; padding: 9px 12px; font-size: 12.5px; }
+  .nav { flex-direction: row; gap: 4px; }
+  .nav-item { white-space: nowrap; padding: 9px 12px; font-size: 14px; }
   .main { padding: 20px 16px 60px; }
   .stat-row { grid-template-columns: repeat(2, 1fr); }
   .topbar { align-items: flex-start; }
 }
-@media (max-width: 480px) {
-  .assignment-card { flex-wrap: wrap; }
-  .assignment-due { text-align: left; }
+
+@media (max-width: 560px) {
+  /* The old fix just set flex-wrap on the card, which crammed the
+     checkbox, title, subject chips, due date and edit/delete buttons
+     into overlapping lines. Use an explicit grid instead: checkbox +
+     info on row 1, due date on row 2, actions on row 3 — nothing can
+     overlap regardless of how much content is inside .assignment-info. */
+  .assignment-card {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    grid-template-areas:
+      "check info"
+      ".     due"
+      ".     actions";
+    row-gap: 8px;
+    column-gap: 12px;
+    align-items: start;
+  }
+  .assignment-check { grid-area: check; }
+  .assignment-info { grid-area: info; min-width: 0; }
+  .assignment-due {
+    grid-area: due;
+    text-align: left;
+    min-width: 0;
+  }
+  .assignment-actions { grid-area: actions; }
 }
